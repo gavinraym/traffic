@@ -1,2 +1,16 @@
-# traffic
-Classifying traffic signs using a neural network
+# Capstone 3 proposal
+
+
+## **Option One** - Keeping it simple:
+
+In 2011, the German Traffic Sign Detection Benchmark competition was held, asking participants to classify pictures of road signs. I have included a pdf about it in this directory. For my capstone, I would like to design a CNN architecture pipeline that can classify these signs. I would like to use the dataset from this competition to train a CNN model that does better than the winners (98.98%).
+
+The photos have already been altered in 3 ways: HOG, HAAR, and Hue hist. I will use these to make 4 different nueral network classifiers. These will make up the base layer of my pipeline. 
+
+I will use the output from the base layer cnns to train a fifth cnn that classifies each photo based on which base layer cnn is most appropriate for it. The idea here is that the photos are taken in different conditions, and some are blurry or whatever. Each baselayer cnn will be potentially better for certain photo types. By classifying the photos into 4 categories (based on which base layer cnn is most accurate for that photo), and then training a fifth cnn to act as the beginning layer of the pipeline, I may be able to achieve higher overall accuracy. 
+
+The last step of my pipeline will be to add a 44th class (there are 43 casses of signs, and then I'll add one more for signs that the cnn is uncertain about.) My thought here is that self driving cars could make catestrophic (deadly) mistakes by mis-classifying signs. It would be much more advantageous to acknowledge when we are uncertain about what a sign is. This would allow the car to use other information sources, ask the user for help, or simply slow down and adjust the cameras to get a better look at the sign.
+
+Potential difficulties: Achieving unbalanced classes in the base layer. To prevent this, I will plan on sorting the photos based on the outputted probabilities from the base layer cnns. Groupings will be made with the photos with highest correct probability for each cnn, with no one cnn getting more than 25% of the overall photos. I will evaluate the effectiveness of this model by calculating the overal effectiveness of each cnn compared to the others with all the data that is NOT in it's data set. Each base layer cnn should do worse on the data going to the other cnns than 1) it does on its own data 2) than the other cnns do on there own.
+
+
