@@ -5,11 +5,11 @@
 
 In 2011, the German Traffic Sign Detection Benchmark competition was held, asking participants to classify pictures of road signs. I have included a pdf about it in this directory. For my capstone, I would like to design a CNN architecture pipeline that can classify these signs. I would like to use the dataset from this competition to train a CNN model that does better than the winners (98.98%).
 
-At first I thought this would be a really easy data set, but then I looked at the test data! It's full of images that are really difficult to classify like this one: 
+At first I thought this would be a really easy data set, but then I looked at the test data! It's full of images that are really difficult to classify like these: 
 
-![stickers](temp0.png)
+![stickers](temp0.png) ![dark](temp1.png) ![graffiti](temp2.png) ![dark2](temp3.png) [blurr](temp4.png) 
 
-It's got stickers all over it! And they are all like that, or taken at night at such. So, with an imported model, I'm getting 99.99% accuracy with the training/test data, and .07% accuracy with the test data. I think this will actually be a difficult problem to solve.
+Ther's stickers and darkness and all matter of confusion that does not appear in the training data! And they are all like that. So, with an imported model, I'm getting 99.99% accuracy with the test data, and 7% accuracy with the test data. I think this will actually be a difficult problem to solve.
 
 Maybe i can use the output from the base layer cnns to train a fifth cnn that classifies each photo based on which base layer cnn is most appropriate for it? IDK, room to explore. I'll focus on making things more complicated to get better results, and then simplifying to reduce complexity... rinse, spin, repeat.
 
