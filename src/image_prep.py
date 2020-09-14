@@ -6,14 +6,17 @@ from keras.utils import to_categorical
 import numpy as np
 import matplotlib.pyplot as plt
 
-filters_list = [('blur',ImageFilter.BLUR),
-                ('contour',ImageFilter.CONTOUR),
-                ('detail',ImageFilter.DETAIL),
-                ('edge',ImageFilter.EDGE_ENHANCE_MORE),
-                ('emboss',ImageFilter.EMBOSS),
-                ('edges',ImageFilter.FIND_EDGES),
-                ('sharpen',ImageFilter.SHARPEN),
-                ('smooth',ImageFilter.SMOOTH_MORE)]
+
+filters_list = [('BLUR',ImageFilter.BLUR),
+                ('CONTOUR',ImageFilter.CONTOUR),
+                ('DETAIL',ImageFilter.DETAIL),
+                ('EDGE_ENHANCE',ImageFilter.EDGE_ENHANCE),
+                ('EDGE_ENHANCE_MORE',ImageFilter.EDGE_ENHANCE_MORE),
+                ('EMBOSS',ImageFilter.EMBOSS),
+                ('FIND_EDGES',ImageFilter.FIND_EDGES),
+                ('SHARPEN',ImageFilter.SHARPEN),
+                ('SMOOTH',ImageFilter.SMOOTH),
+                ('SMOOTH_MORE',ImageFilter.SMOOTH_MORE)]
 
 for pil_name, pil_filter in filters_list:
     os.mkdir(f'data/{pil_name}/')
