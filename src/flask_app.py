@@ -7,10 +7,12 @@ import json
 import os
 import ast
 from PIL import Image
+import pickle
+from model import Model
+import PIL
 
 app = Flask(__name__)
-class_map = pd.read_csv('data/meta/meta_map.csv', index_col=0)
-
+class_map = pd.read_csv('meta/meta_map.csv', index_col=0)
 
 @app.route('/', methods= ['GET', 'POST'])
 def home_page():
@@ -18,21 +20,23 @@ def home_page():
     html = f'''
         <html><center>
             <head>
-                <img src={{url_for('static', filename='0.png') }} >
+                <img src="meta/0.png"  />
                 <h1>Image Classification</h1>
             </head>
         '''
 
-    with open('reports/index.txt', 'r') as f:
-        models = f.readlines()
-    for model in models:
-        model = ast.literal_eval(model)
+    with open('models/index.txt', 'r') as f:
+        info_list = f.readlines()
+
+    for line in info_list:
+        info = ast.literal_eval(line)
+
         html = html + f'''
         <body><center>
-            <h4>[{model['id']}] {model['name']} - {model['timestamp']}</h4>
-            <h6>Score: {model['Accuracy score']} ({model['True Predictions']}/{model['Total Predictions']})
+            <h4>[{info['id']}] {info['name']} - {info['timestamp']}</h4>
+            <h6>Score: {info['Accuracy score']} ({info['True Predictions']}/{info['Total Predictions']})
             <form action="/report" method="POST" >
-                <input type="submit" name="{model['id']}" value="Generate Report" />
+                <input type="submit" name="{info['id']}" value="Generate Report" />
             </form>
         </center></body>
         '''
@@ -42,29 +46,38 @@ def home_page():
 
 @app.route('/report', methods=['GET','POST'])
 def report_page():
+    info = None
     model = None
-    with open('reports/index.txt', 'r') as f:
-        model_list = f.readlines() 
-    for line in model_list:
-        line = ast.literal_eval(line)
+
+    with open('models/index.txt', 'r') as f:
+        info_list = f.readlines() 
+    for line in info_list:
+        info = ast.literal_eval(line)
+    
         try:
-            if 'Generate Report' == request.form[line['id']]:
-                model = line
+            if 'Generate Report' == request.form[str(info['id'])]:
+                
+                with open(info['pickle path'], 'rb') as fb:
+                    model = pickle.load(fb)
                 break
         except:
             pass
 
+    
+
     html = f'''
     <html>
         <head>
-            <h1>Model name: {model['name']}</h1>
-            <h2>Created on: {model['timestamp']}
-            <h2>Accuracy Score: {model['Accuracy score']} ({model['True Predictions']} / {model['Total Predictions']})
+            <h1>Model name: {model.name}</h1>
+            <h2>Created on: {model.timestamp}
+            <h2>Accuracy Score: {info['Accuracy score']} ({info['True Predictions']} / {info['Total Predictions']})
         </head>
+        <body>
+            <img src="{{model.graph}}"">
+        </body>
     '''
-
-    # This data is used for class specific reporting
-    preds = pd.read_csv(model['path'], index_col=0)
+    # preds data
+    preds = model.preds.dropna()
 
     # Each individual class data is displayed
     for sign in range(43):
@@ -74,7 +87,7 @@ def report_page():
         html = html+f'''
         <body><br><br>-------------------------------------------------<br>
             <h3>Target Class #{sign} - {class_map.iloc[sign][0]}</h3>
-            <img src="data/meta/{sign}.png" >
+            <img src="meta/{sign}.png" >
             <h3>Accuracy score = {int((group_preds.loc[sign][0] / len(sign_preds))*100)}%</h3>
             <h3>Predicted as (class, number):</h3>
             <h5>          

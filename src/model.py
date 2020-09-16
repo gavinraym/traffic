@@ -10,18 +10,38 @@ from PIL import Image, ImageFilter
 import shutil
 from datetime import datetime
 import json
+import pickle
+from matplotlib import pyplot as plt
+from tensorboard.backend.event_processing import event_accumulator
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 class Model():
     '''Create a neural network!'''
     def __init__(self, name, description=''):
         self.index = len(os.listdir('models/'))
         self.name = name
+        self.timestamp = datetime.now().strftime('%m/%d %H:%M')
+        self.model_path = f'models/{self.index}_{self.name}'
+        self.pickle_path = f'pickles/{self.index}_{self.name}.pk'
         self.description = description
-        self.model = Sequential()
-        self.save = lambda: self.model.save(f'models/{name}')
-        self.filters = 0
-        self.images = 0
-        os.mkdir(f'logs/{self.index}')
+        self.filters = list()
+        self.graph = None
+        self.preds = pd.DataFrame(columns=['predicted_class', 'actual_class', 'image_location'])
+        self.conf_matrix = list()
+        self.heat_map = None
+        if os._exists(self.model_path): 
+            self.model = load_model(self.model_path)
+        else:
+            self.model = Sequential()
+
+    def save(self):
+        self.model.save(self.model_path)
+        self.model = None
+        with open(self.pickle_path, 'wb') as fb:
+            pickle.dump(self, fb)
+        self.model = load_model(self.model_path)
+
         
     def add_layers(self, depth=3, dropout=.25, func='relu'):
         '''Add 2,4,or 6 layers to your network.
@@ -52,13 +72,28 @@ class Model():
     def fit(self, filters=['train'], epochs=10):
         '''Fit the model with a selection of image preprocessing filter
         and number of epochs'''
+        
+        # Using tensorboard to make graphs for the scoring report, and for choosing best model
+        os.mkdir('temp_log')
+        os.mkdir('temp_model')
+        tensorboard_callback = TensorBoard(
+                    log_dir=f"temp_log",
+                    histogram_freq=0,
+                    write_graph=False,
+                    write_images=False,
+                    update_freq='epoch',
+                    profile_batch=2,
+                    embeddings_freq=0,
+                    embeddings_metadata=None)
+        tensor_checkpoint = ModelCheckpoint('temp_model', save_best_only=True)
+
+        # Filter needs to be a PIL.Image filter
         for filter in filters:
             if filter in ('BLUR','CONTOUR','DETAIL','EDGE_ENHANCE','EDGE_ENHANCE_MORE',
                             'EMBOSS','FIND_EDGES','SHARPEN','SMOOTH','SMOOTH_MORE','train'):
 
-                # Keeping track of the number of filters used in preprocessing, 
-                # this shows up on the report
-                self.filters += 1
+                # Keeping track of filters used in preprocessing
+                self.filters.append(filter)
                 
                 # Data generators make training the model easy and fun!
                 datagen = ImageDataGenerator(rescale=1./255, 
@@ -81,18 +116,6 @@ class Model():
                             batch_size=64,
                             subset='validation')
 
-                # Using tensorboard to make graphs for the scoring report
-                tensorboard_callback = TensorBoard(
-                            log_dir=f"logs/{self.index}/",
-                            histogram_freq=0,
-                            write_graph=True,
-                            write_images=False,
-                            update_freq='epoch',
-                            profile_batch=2,
-                            embeddings_freq=0,
-                            embeddings_metadata=None)
-                tensor_checkpoint = ModelCheckpoint('data/models', save_best_only=True)
-
                 # Time to fit our generator with the training images!
                 self.model.fit_generator(
                             train_generator,
@@ -104,7 +127,32 @@ class Model():
                             workers=0,
                             callbacks=[tensorboard_callback,tensor_checkpoint])
 
-        self.images += 29416
+        # Creating a graph of loss and accuracy from the Tensorboard log files
+        fig, axes = plt.subplots(2,1, sharex=True)
+
+        # Plotting train and val data
+        for d in ['train','validation']:
+            ea = event_accumulator.EventAccumulator(f'temp_log/{d}')
+            df = pd.DataFrame(ea.Reload().Scalars('epoch_loss'))
+            axes[0].plot(df.step, df.value, label=d)
+            df = pd.DataFrame(ea.Reload().Scalars('epoch_accuracy'))
+            axes[1].plot(df.step, df.value, label=d)
+
+        # Setting labels and titles
+        axes[1].set_xlabel('Epochs')
+        axes[1].legend()
+        axes[0].set_ylabel('Loss')
+        axes[1].set_ylabel('Accuracy')
+        fig.suptitle(f'{self.name}')
+
+        # Save graph and delete temp files
+        self.graph = fig
+        shutil.rmtree('temp_log')
+
+        # Save the best version of this model and delete temp files
+        self.model = load_model('temp_model')
+        shutil.rmtree('temp_model')
+
         self.save()
         
     def score(self, threshold=0):
@@ -122,9 +170,9 @@ class Model():
 
         # This block of code predicts on the test images, and compiles the results
         # into a pd.DataFrame called preds. This df is then used to generate the reports 
-        preds = pd.DataFrame(columns=['predicted_class', 'actual_class', 'image_location'])
         actual = pd.read_csv('data/test_classes.csv', index_col=0)
         src_file = os.listdir(f'data/test')
+
         for img_file in src_file:
             # Here, each test image is being predicted on in turn. 
             if img_file[-3:] != 'csv':
@@ -138,48 +186,57 @@ class Model():
                 certainty_values = self.model.predict(image)[0]
                 predicted_class = np.argmax(certainty_values, axis=-1)
                 if certainty_values[predicted_class] < threshold:
-                    predicted_class = 43
+                    predicted_class = None
 
                 # Results are added to preds dictionary
-                preds = preds.append({
+                self.preds = self.preds.append({
                     'predicted_class': predicted_class,
                     'actual_class':actual.loc[img_file]['ClassId'], 
                     'image_location':img_file
                     }, ignore_index=True)
 
-        # Creating a unique path name for saving various reports 
-        report_dir = os.listdir('reports/')
-        count = 0
-        file_path = f'reports/{self.name}_{count}.csv'
-        while file_path in report_dir:
-            count += 1
-            file_path = f'reports/{self.name}_{count}.csv'
-
-        preds.to_csv(f'{file_path}')
-
         # Basic model information will be saved to index.json for viewing on home page
-        report = {'id' : len(report_dir)}
+        report = {'id' : self.index}
         report['name'] = self.name
-        report['timestamp'] = datetime.now().strftime('%m/%d_%H:%M')
-        report['path'] = file_path
+        report['timestamp'] = self.timestamp
+        report['model path'] = self.model_path
+        report['pickle path'] = self.pickle_path
                 
         # Add basic stats and scores of the model to the report
-        non_unknown = preds[preds['predicted_class'] != 43]
+        non_unknown = self.preds[self.preds['predicted_class'] != None]
         acc_preds = non_unknown[non_unknown['predicted_class'] == non_unknown['actual_class']]
         report['True Predictions'] = len(acc_preds)
         report['Total Predictions'] = len(non_unknown)
         report['Accuracy score'] = f'{round((len(acc_preds)/len(non_unknown))*100)}%'
 
-        with open('reports/index.txt', 'a') as fp:
+        # Save the report summary into index.txt
+        with open('models/index.txt', 'a') as fp:
             print(report, file=fp)
-            fp.write('\n')
+
+        # Creating confusion matrix and storing it in self.conf_matrix
+        self.conf_matrix = list()
+        for sign in range(43):
+            ls = [0]*43
+            sign_preds = self.preds[self.preds.actual_class == sign]
+            group_preds = sign_preds.groupby('predicted_class').count()
+            for i in group_preds.index:
+                ls[i] = group_preds.loc[i]['actual_class']
+            self.conf_matrix.append(ls)
+
+        # Create heat map with seaborn
+        plt.figure()
+        self.heat_map = sns.heatmap(self.conf_matrix)
+        plt.close()
+
+        self.save()
 
 if __name__ == '__main__':
-    if os._exists('reports/index.txt') == False: os.mkdir('reports/index.txt')
-    model = Model('traffic_')
+    if not os._exists('models/index.txt'): pass
+    else: os.mkdir('models/index.txt')
+    model = Model('traffic')
     model.add_layers(depth=1)
-    model.fit(epochs=10)
-    model.score(threshold=.5)
+    model.fit(epochs=2)
+    model.score(threshold=0)
 
 
 
