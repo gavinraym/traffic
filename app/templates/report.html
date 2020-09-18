@@ -16,19 +16,48 @@
 <body>
     <h1>{{summary.id}} {{summary.name}}</h1>
     <h2>Created on: {{summary.timestamp}}</h2>
-    <hr><br>
-    <h2>Scoring Metrics</h2>
+    <h2>{{description}}</h2>
     <h2>Accuracy Score: {{summary['Accuracy score']}} ({{summary['True Predictions']}} / {{summary['Total Predictions']}})</h2>
-    <h2><img src="static/images/heat_map.png" class='center' /></h2>  
-    <hr><br>  
-    <h2>Training Metrics</h2>
+    
+    <hr><br>
+    <h2>Architecture</h2>
+    <h2>Training time: {{fit_time}} minutes</h2>
+    <h2>Number of deep layer blocks: {{architecture[0]}}</h2>
+    <h2>Dropout set at {{architecture[1]}}</h2>
+    <h2>Activation function used: {{architecture[2]}}</h2>
+    <h2>Preprocessing filters used: {{filters}}</h2>
+    <h2>Summary<br>
+        {% for line in model_summary %}
+        {{line}}
+        {% endfor %}
+    </h2>
+
     <h2><img src="static/images/graph.png" class='center' /></h2>
     <hr><br>
+    <h2>Evaluation</h2>
+    <h2><img src="static/images/heat_map.png" class='center' /></h2>
     <h2><img src="static/images/roc.png" class='center' /></h2>
     <hr><br>
     <h2>A Collection of Mis-Classified Images</h2>
         {% for loc in wrong_list %}
-        <img src="{{url_for('static', filename='images/test/'+loc)}}" class="center"}}>
+        <img src="static/images/test/{{loc[:-3]+'png'}}">
+        {% endfor %}
+    <hr><br>
+    <h2>A Collection of Correctly Classified Images</h2>
+        {% for loc in right_list %}
+        <img src="static/images/test/{{loc[:-3]+'png'}}">
+        {% endfor %}  
+    <hr><br> 
+        {% for ind in range(43) %}
+        <h2>Sign {{ind}}: {{meta_map[ind]}}</h2>
+        <h2><img src="static/images/{{ind}}.png" class="center"></h2>
+        <h2>ACC = {{acc[ind]}}</h2>
+        <h2>Predicted as: {{class_preds[ind]}}</h2>
+        <h2>True Positive with highest confidence:</h2>
+        <h2><img src="static/images/test/{{most_tp[ind][:-3]+'png'}}" class="center"></h2>
+        <h2>True Positive with lowest confidence:</h2>
+        <h2><img src="static/images/test/{{least_tp[ind][:-3]+'png'}}" class="center"></h2>
+        <hr><br>
         {% endfor %}
 </body>
 </html>

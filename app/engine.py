@@ -8,14 +8,13 @@ import os
 import ast
 from PIL import Image
 import pickle
-from model import Model
 import PIL
 import matplotlib.pyplot as plt
 
 app = Flask(__name__)
 
-with open('app/static/meta/meta_map.txt', 'r') as f:
-    meta_map = ast.literal_eval(f.readline())
+class Model():
+    pass
     
 @app.route("/")
 def main():
@@ -32,6 +31,8 @@ def main():
 def report_page():
     summary = None
     model = None
+    with open('app/static/meta_map.txt', 'r') as f:
+        meta_map = ast.literal_eval(f.readline())
 
     with open('models/index.txt', 'r') as f:
         info_list = f.readlines() 
@@ -46,16 +47,33 @@ def report_page():
 
     with open(summary['pickle path'], 'rb') as fb:
         model = pickle.load(fb)
+
     model.graph.savefig('app/static/images/graph.png')
     model.heat_map.savefig('app/static/images/heat_map.png')
     model.ROC.savefig('app/static/images/roc.png')
 
     wrong = model.preds[model.preds.actual_class != model.preds.predicted_class]
-    
+    w_samples = wrong.image_location.sample(min(len(wrong),75))
+ 
+    right = model.preds[model.preds.actual_class == model.preds.predicted_class]
+    r_samples = right.image_location.sample(min(len(right),75))
 
-
-
-    return render_template('report.html', summary=summary, wrong_list=wrong.image_location.sample(25))
+    return render_template(
+        'report.html',
+        summary=summary,
+        fit_time = model.fit_time,
+        description = model.description,
+        filters = model.filters,
+        architecture = model.architecture,
+        model_summary = model.summary,
+        wrong_list=w_samples,
+        right_list=r_samples,
+        meta_map=meta_map,
+        most_tp = list(model.class_data.most_tp),
+        least_tp = list(model.class_data.least_tp),
+        acc = list(model.class_data.acc),
+        class_preds = list(model.class_data.class_pred)
+        )
 
     
 app.run(host='0.0.0.0', port=8080, debug=True)
