@@ -1,0 +1,1 @@
+{'id': 1, 'name': 'traffic', 'description': 'A simple model from data-flair.training/blogs/python-project-traffic-signs-recognition', 'timestamp': '09/19 08:44', 'model path': 'models/1_traffic', 'pickle path': 'pickles/1_traffic.pk', 'True Predictions': 10807, 'Total Predictions': 12630, 'Accuracy score': '86%'}
