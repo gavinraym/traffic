@@ -16,7 +16,7 @@ from matplotlib import pyplot as plt
 from tensorboard.backend.event_processing import event_accumulator
 import matplotlib.pyplot as plt
 import seaborn as sns
-
+import tensorflow_hub as hub
 
 class Model():
     '''Create a neural network!'''
@@ -29,7 +29,6 @@ class Model():
         self.description = description
         self.filters = list()
         self.architecture = list()
-        self.summary = list()
         self.graph = None
         self.preds = pd.read_csv('data/test_classes.csv')
         self.conf_matrix = list()
@@ -46,15 +45,19 @@ class Model():
     def add_layers(self, depth=3, dropout=.25, func='relu'):
         '''Add 2,4,or 6 layers to your network.
         Choose a dropout rate, and an activation function too!'''
-        model = Sequential()
         self.architecture = [depth, dropout, func]
+
+        model = Sequential([
+            hub.KerasLayer("https://tfhub.dev/google/imagenet/inception_resnet_v2/classification/4",
+            trainable=True, arguments=dict(batch_norm_momentum=0.997))
+        ])
+        model.build([None, 30, 30, 3])
+        
         model.add(Conv2D(filters=32, kernel_size=(5,5), activation=func, input_shape=(30, 30,3)))
         model.add(Conv2D(filters=32, kernel_size=(5,5), activation=func))
-        model.add(BatchNormalization())
         model.add(Dropout(rate=dropout))
         model.add(Conv2D(filters=64, kernel_size=(3,3), activation=func))
         model.add(Conv2D(filters=64, kernel_size=(3,3), activation=func))
-        model.add(BatchNormalization())
         model.add(MaxPool2D(pool_size=(2,2)))
         model.add(Conv2D(filters=64, kernel_size=(3,3), activation=func))
         model.add(Conv2D(filters=64, kernel_size=(3,3), activation=func))
@@ -62,19 +65,13 @@ class Model():
         model.add(Dense(256, activation=func))
         model.add(Dropout(rate=dropout))
         model.add(Dense(43, activation='softmax'))
-        model.compile(
-            loss='categorical_crossentropy',
-            optimizer=keras.optimizers.Adam(learning_rate=.001),
-            metrics=['accuracy']
-            )
-        model.summary(print_fn= lambda x: self.summary.append(x))
+        model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
         self.save(model)
 
     def fit(self, filters=['train'], epochs=10):
         '''Fit the model with a selection of image preprocessing filter
         and number of epochs'''
         model = load_model(self.model_path)
-        os.mkdir('temp_model')
 
         # Using tensorboard to make graphs for the scoring report, and for choosing best model
         tensorboard_callback = TensorBoard(
@@ -86,7 +83,7 @@ class Model():
                     profile_batch=2,
                     embeddings_freq=0,
                     embeddings_metadata=None)
-        tensor_checkpoint = ModelCheckpoint('temp_model', save_best_only=False)
+        tensor_checkpoint = ModelCheckpoint('temp_model', save_best_only=True)
 
         # Creating a graph of loss and accuracy from the Tensorboard log files
         fig, axes = plt.subplots(2,1, sharex=True)
@@ -95,12 +92,12 @@ class Model():
         for filter in filters:
             if filter in ('BLUR','CONTOUR','DETAIL','EDGE_ENHANCE','EDGE_ENHANCE_MORE',
                             'EMBOSS','FIND_EDGES','SHARPEN','SMOOTH','SMOOTH_MORE','train'):
-                self.filters.append(filter)
+
                 os.mkdir('temp_log')
-                
+                os.mkdir('temp_model')
                 
                 # Data generators make training the model easy and fun!
-                datagen = ImageDataGenerator(
+                datagen = ImageDataGenerator(rescale=1./255, 
                             shear_range=0.2,
                             zoom_range=0.2,
                             rotation_range=45,
@@ -149,11 +146,19 @@ class Model():
                 # Removing the logs and using the best model after each filter training
                 # ensures the best model from each round and no double graphing of data
                 # If a better model was not made with this filter, then pass
+                try:
+                    # Keeping track of filters used in preprocessing for report
+                    self.filters.append(filter)
+                    model = load_model('temp_model')
+                except:
+                    pass
+
+                shutil.rmtree('temp_model')
                 shutil.rmtree('temp_log')
 
         # Setting labels and titles
         axes[1].set_xlabel('Epochs')
-        axes[1].legend(bbox_to_anchor=(0, 1.5), loc='upper left')
+        axes[1].legend(bbox_to_anchor=(1.05, 1), loc='upper left')
         axes[0].set_ylabel('Loss')
         axes[1].set_ylabel('Accuracy')
         fig.suptitle(f'Loss and Accuracy logged during training.')
@@ -163,7 +168,6 @@ class Model():
         
         # Save the best version of this model and delete temp files
         self.save(model)
-        shutil.rmtree('temp_model')
 
     def score(self):
         '''[score_it] function, for evaluating saved models with test images.
@@ -291,8 +295,8 @@ if __name__ == '__main__':
     if not os._exists('models/index.txt'): pass
     else: os.mkdir('models/index.txt')
     model = Model('traffic')
-    model.add_layers(dropout=.2, func='sigmoid')
-    model.fit(filters=['BLUR','CONTOUR','DETAIL','EDGE_ENHANCE','EDGE_ENHANCE_MORE','EMBOSS','FIND_EDGES','SHARPEN','SMOOTH','SMOOTH_MORE','train'], epochs=20)
+    model.add_layers(depth=2, dropout=.3, func='selu')
+    model.fit(filters=['BLUR','train','CONTOUR','DETAIL','SMOOTH_MORE'], epochs=25)
     model.score()
 
 
