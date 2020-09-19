@@ -31,14 +31,14 @@ def main():
 def report_page():
     summary = None
     model = None
-    with open('app/static/meta_map.txt', 'r') as f:
+    with open('app/static/meta_images/meta_map.txt', 'r') as f:
         meta_map = ast.literal_eval(f.readline())
 
     with open('models/index.txt', 'r') as f:
         info_list = f.readlines() 
     for line in info_list:
         summary = ast.literal_eval(line)
-    
+        # breakpoint()
         try:
             if 'Generate Report' == request.form[str(summary['id'])]:
                 break
@@ -48,9 +48,9 @@ def report_page():
     with open(summary['pickle path'], 'rb') as fb:
         model = pickle.load(fb)
 
-    model.graph.savefig('app/static/images/graph.png')
-    model.heat_map.savefig('app/static/images/heat_map.png')
-    model.ROC.savefig('app/static/images/roc.png')
+    model.graph.savefig('app/static/temp_images/graph.png')
+    model.heat_map.savefig('app/static/temp_images/heat_map.png')
+    model.ROC.savefig('app/static/temp_images/roc.png')
 
     wrong = model.preds[model.preds.actual_class != model.preds.predicted_class]
     w_samples = wrong.image_location.sample(min(len(wrong),75))
