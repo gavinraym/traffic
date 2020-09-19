@@ -3,6 +3,7 @@ from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.callbacks import TensorBoard, ModelCheckpoint
 from keras.models import Sequential, load_model
 from keras.layers import Conv2D, MaxPool2D, Dense, Flatten, Dropout, BatchNormalization
+from keras.optimizers import Adam
 import os
 import pandas as pd
 import numpy as np
@@ -64,7 +65,7 @@ class Model():
         model.add(Dense(43, activation='softmax'))
         model.compile(
             loss='categorical_crossentropy',
-            optimizer=keras.optimizers.Adam(learning_rate=.001),
+            optimizer=Adam(learning_rate=.001),
             metrics=['accuracy']
             )
         model.summary(print_fn= lambda x: self.summary.append(x))
