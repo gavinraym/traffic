@@ -8,31 +8,55 @@
         h3 {text-align: center; font-size: 22px}
         h4 {text-align: center; font-size: 18}
         h6 {text-align: center; font-size: 16}
-        body {background-color: rgb(250, 229, 202);}
+        body {background-color: #116466}
+        .column{
+            float: left;
+            width: 33.33%;
+            height: 500px;
+        }
+        .row:after {
+            content: "";
+            display: table;
+            clear: both;
+        }
+        @media screen and (max-width: 600px) {
+            .column {
+                width: 100%;
+        }}
     </style>
+</head>
+<body>
     <meta charset="utf-8">
     <meta name="viewport"
         content="width=device-width, initial-scale=1, user-scalable=yes">
         <h1>Auto-Moto</h1>
         <h2>Traffic Sign Classification Dashboard</h2>    
-        <h2><img src="static/images/0.png" class='center' /></h2>  
-        <br><br><hr>   
-</head>
-<body>
-    <hr>
-        
-    <hr>
+        <h2><img src="static/placeholder.jpg" class='center' style='width:500px;height: 350px;'/></h2>    
 </body>
 <body>
-    <h3>Here is a list of all the models that have been trained.</h3>
-    {% for summary in info_list %}
-    <h4>{{summary['id']}} {{summary['name']}} - {{summary['timestamp']}} Score: {{summary['Accuracy score']}}
-        <form action="/report" method="POST" >
-            <input type="submit" name="{info['id']}" value="Generate Report" />
-        </form>
-    </h4>
-    {% endfor %}
+    <div class="row">
+        <div class="column" style="background-color: #e29b5d">
+            <h3>About</h3>
+            <h4>About the project</h4>
+        </div>
+        <div class="column" style="background-color: #d15d39">
+            <h3>Here is a list of all the models that have been trained.</h3>
+            {% for summary in info_list %}
+            <h4>{{summary['id']}} {{summary['name']}} - {{summary['timestamp']}} Score: {{summary['Accuracy score']}}
+                <br>{{summary['description']}}
+                <form action="/report" method="POST" >
+                    <input type="submit" name="{{summary['id']}}" value="Generate Report" />
+                </form>
+            </h4>
+            {% endfor %}
+        </div>
+        <div class="column" style="background-color: #bb9068">
+            <h3>Gavin Ray</h3>
+            <p>About me</p>
+        </div>
+    </div> 
 </body>
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
 
 
 </html>

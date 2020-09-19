@@ -32,31 +32,31 @@
         {% endfor %}
     </h2>
 
-    <h2><img src="static/images/graph.png" class='center' /></h2>
+    <h2><img src="static/temp_images/graph.png" class='center' /></h2>
     <hr><br>
     <h2>Evaluation</h2>
-    <h2><img src="static/images/heat_map.png" class='center' /></h2>
-    <h2><img src="static/images/roc.png" class='center' /></h2>
+    <h2><img src="static/temp_images/heat_map.png" class='center' /></h2>
+    <h2><img src="static/temp_images/roc.png" class='center' /></h2>
     <hr><br>
     <h2>A Collection of Mis-Classified Images</h2>
         {% for loc in wrong_list %}
-        <img src="static/images/test/{{loc[:-3]+'png'}}">
+        <img src="static/test_images/{{loc[:-3]+'png'}}">
         {% endfor %}
     <hr><br>
     <h2>A Collection of Correctly Classified Images</h2>
         {% for loc in right_list %}
-        <img src="static/images/test/{{loc[:-3]+'png'}}">
+        <img src="static/test_images/{{loc[:-3]+'png'}}">
         {% endfor %}  
     <hr><br> 
         {% for ind in range(43) %}
         <h2>Sign {{ind}}: {{meta_map[ind]}}</h2>
-        <h2><img src="static/images/{{ind}}.png" class="center"></h2>
+        <h2><img src="static/meta_images/{{ind}}.png" class="center"></h2>
         <h2>ACC = {{acc[ind]}}</h2>
         <h2>Predicted as: {{class_preds[ind]}}</h2>
         <h2>True Positive with highest confidence:</h2>
-        <h2><img src="static/images/test/{{most_tp[ind][:-3]+'png'}}" class="center"></h2>
+        <h2><img src="static/test_images/{{most_tp[ind][:-3]}}png" class="center" alt="static/meta_images/18.png"></h2>
         <h2>True Positive with lowest confidence:</h2>
-        <h2><img src="static/images/test/{{least_tp[ind][:-3]+'png'}}" class="center"></h2>
+        <h2><img src="static/test_images/{{least_tp[ind][:-3]}}png" class="center" alt="static/meta_images/18.png"></h2>
         <hr><br>
         {% endfor %}
 </body>
