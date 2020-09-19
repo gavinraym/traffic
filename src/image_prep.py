@@ -47,8 +47,7 @@ for pil_name, pil_enhancer in enhance_list:
             if img_file[-3:] == 'ppm':
                 image = Image.open(f'data/train/{k}/{img_file}')
                 enhancer = pil_enhancer(image)
-                enhancer(.5).save(f'data/{pil_name}/{k}/{img_file}.5', 'ppm')
-                enhancer(.25).save(f'data/{pil_name}/{k}/{img_file}.25', 'ppm')
+                enhancer.enhance(.25).save(f'data/{pil_name}/{k}/{img_file}.ppm')
 
 src_folder = os.listdir('data/test/')
 for k in src_folder:
