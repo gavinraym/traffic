@@ -10,9 +10,7 @@ filters_list = [('BLUR',ImageFilter.BLUR),
                 ('FIND_EDGES',ImageFilter.FIND_EDGES),
                 ('SHARPEN',ImageFilter.SHARPEN),
                 ('SMOOTH',ImageFilter.SMOOTH),
-                ('SMOOTH_MORE',ImageFilter.SMOOTH_MORE),
-                ('brightness', ImageEnhance.Brightness),
-                ('contrast', ImageEnhance.Contrast)]
+                ('SMOOTH_MORE',ImageFilter.SMOOTH_MORE)]
 
 enhance_list = [
                 ('brightness', ImageEnhance.Brightness),
