@@ -1,10 +1,5 @@
 from PIL import Image, ImageFilter, ImageEnhance
 import os
-import pandas as pd
-import numpy as np
-from keras.utils import to_categorical
-import numpy as np
-import matplotlib.pyplot as plt
 
 filters_list = [('BLUR',ImageFilter.BLUR),
                 ('CONTOUR',ImageFilter.CONTOUR),
