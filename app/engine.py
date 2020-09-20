@@ -48,9 +48,9 @@ def report_page():
     with open(summary['pickle path'], 'rb') as fb:
         model = pickle.load(fb)
 
-    model.graph.savefig('app/static/temp_images/graph.png')
-    model.heat_map.savefig('app/static/temp_images/heat_map.png')
-    model.ROC.savefig('app/static/temp_images/roc.png')
+    Image.open(f'{model.report_image_path}graph.png').save('app/static/temp_images/graph.png')
+    # Image.open(f'{model.report_image_path}heat_map.png'.save('app/static/temp_images/heat_map.png')
+    # model.ROC.savefig('app/static/temp_images/roc.png')
 
     wrong = model.preds[model.preds.actual_class != model.preds.predicted_class]
     w_samples = wrong.image_location.sample(min(len(wrong),75))
