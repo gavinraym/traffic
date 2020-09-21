@@ -1,0 +1,96 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <style>
+        h1 {text-align: center; font-size: 35px;}
+        h2 {text-align: center; font-size: 25px;}
+        h3 {text-align: center; font-size: 22px}
+        h4 {text-align: center; font-size: 18}
+        h6 {text-align: center; font-size: 16}
+        p {margin-left: 10px; margin-right: 10px; text-indent: 50px; font-size: 22px}
+        body {background-color: #116466}
+        .column{
+            float: left;
+            width: 25%;
+            height: 200px;
+        }
+        .row:after {
+            content: "";
+            display: table;
+            clear: both;
+        }
+        @media screen and (max-width: 600px) {
+            .column {
+                width: 100%;
+        }}
+    </style>
+</head>
+<body>
+    <meta charset="utf-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1, user-scalable=yes">
+        <h1>Auto-Moto</h1>
+        <h2>Final Model Evaluation</h2>  
+        <p>I had originally made an ROC curve for this section, but the area under the curve was
+            great enough to render the chart useless. Instead I have made these matrices which 
+            compare how changing the confidence threshold affects the true positive rate. The chart 
+            on the left assumes every prediction is correct regardless of the confidence. While the 
+            chart on the right only accepts predictions made with a probability above 95%. In this way
+            I have turned a multi-class classification problem into a binary classification problem.
+        </p>  
+        <img src='static/final_report/matrix.png' class="center"/>
+        <p>In this case, each classification is a representation of the following:
+            <br>- True Positive: Correctly classified images with confidence above the threshold.
+            <br>- True Negative: Incorrectly classified images with confidence below the threshold.
+            <br>- False Positive: Incorrectly classified images with confidence above the threshold.
+            <br>- False Negative: Correctly classified images with confidence below the threshold. 
+        </p>
+</body>
+<body><hr>
+    <p>
+        Due to the starting model being overfit on the training data, and this leading to me
+        using the test data for model evaluation, there is a possibility that we will overfit to 
+        our test data. The best solution to this issue (and a great solution to almost any data science
+        problem) would be get more data. While it was not possible for me to acquire thousands more
+        photos for testing purposes, my sister agreed to take a few pictures for me. She lives in England,
+        and while the signs there are not entirely the same, these photos provide a difficult and interesting
+        final test.   </p>
+    <div class="row">
+        <div class="column" style="background-color: #5596f7">
+            <h4>Final Test Images</h4>
+        </div>
+        <div class="column" style="background-color: #c479c0">
+            <h4>Actual:</h4>
+        </div>
+        <div class="column" style="background-color: #c479c0">
+            <h4>Predicted As:</h4>
+        </div>
+        <div class="column" style="background-color: #6c59b6">
+            <h3>Certainty</h3>
+                        
+        </div>
+    </div> 
+    {% for row in final_eval %}
+    <div class="row">
+        <div class="column" style="background-color: #5596f7">
+            <h4><img src="static/final_report/libby_signs/{{row[0]}}" class='center' style='width:200px;height: 150px;'/></h4>
+        </div>
+        <div class="column" style="background-color: #c479c0">
+            <h4><img src="static/meta_images/{{row[3]}}" class='center' style='width:200px;height: 150px;'</h4>
+        </div>
+        <div class="column" style="background-color: #c479c0">
+            <h4><img src="static/meta_images/{{row[1]}}.png" class='center' style='width:200px;height: 150px;'/></h4>
+        </div>
+        <div class="column" style="background-color: #6c59b6">
+            <h3>{{row[2]}}</h3>
+                        
+        </div>
+    </div> 
+    {% endfor %}
+</body>
+
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+
+
+</html>

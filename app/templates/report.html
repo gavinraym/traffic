@@ -32,11 +32,11 @@
         {% endfor %}
     </h2>
 
-    <h2><img src="static/temp_images/graph.png" class='center' /></h2>
+    <h2><img src="static/report_images/{{summary['id']}}_{{summary['name']}}_graph.png" class='center' /></h2>
     <hr><br>
     <h2>Evaluation</h2>
-    <h2><img src="static/temp_images/heat_map.png" class='center' /></h2>
-    <h2><img src="static/temp_images/roc.png" class='center' /></h2>
+    <h2><img src="static/report_images/{{summary['id']}}_{{summary['name']}}_heat_map.png" class='center' /></h2>
+    <h2><img src="static/report_images/{{summary['id']}}_{{summary['name']}}_ROC.png" class='center' /></h2>
     <hr><br>
     <h2>A Collection of Mis-Classified Images</h2>
         {% for loc in wrong_list %}

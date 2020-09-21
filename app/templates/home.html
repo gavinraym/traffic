@@ -32,42 +32,66 @@
         content="width=device-width, initial-scale=1, user-scalable=yes">
         <h1>Auto-Moto</h1>
         <h2>Traffic Sign Classification Dashboard</h2>    
-        <h2><img src="static/3388.jpg" class='center' style='width:750px;'/></h2>    
+        <h2><img src="static/banner.jpg" class='center' style='width:750px;'/></h2>    
 </body>
 <body>
     <div class="row">
-        <div class="column" style="background-color: #e29b5d">
+        <div class="column" style="background-color: #5596f7">
             <h3>About Auto-Moto</h3>
-            <h4>About the project</h4>
+            <p>Self driving cars are one of the most exciting technological developments of our lifetimes. 
+                With superior decision making speeds and precision, computers have already proven to be better drivers than
+                humans in many ways. The increase in safety they provide should eventually allow us to raise speed limits 
+                without any ill affect. In fact, I truly believe that in our lifetimes, we may well see the
+                end of traffic accidents and traffic jams to boot. </p>
+                
+            <p>While self driving cars do not rely on 
+                multiclass classification of traffic signs while driving (they use HD maps), building a model 
+                for classifying road signs is still a great exercise in data science. That is exactly what this
+                project seeks to demonstrate.</p>
+
+            <p>For more information on this project and the dataset being used, please follow 
+                the link below. I have also gone into greater detail about the process I went through,
+                and some of the things I learned along the way. </p>
+            <h1>
+                <form action="/about" method="POST" >
+                    <input type="submit" name="About Page" value="About Page" />
+                </form>
+            </h1>
+     
         </div>
-        <div class="column" style="background-color: #d15d39">
-            <h3>Here is a list of all the models that have been trained.</h3>
+        <div class="column" style="background-color: #c479c0">
+            <h3>These are some of the models that I made. You can generate a report on each, or 
+                check out the final evaluation on model #4 at the bottom.
+            </h3>
             {% for summary in info_list %}
-            <h4>{{summary['id']}} {{summary['name']}} - {{summary['timestamp']}} Score: {{summary['Accuracy score']}}
+            <h4>{{summary['id']}} {{summary['name']}} - {{summary['timestamp']}} Score: {{summary['Accuracy score'],2}}
                 <br>{{summary['description']}}
                 <form action="/report" method="POST" >
                     <input type="submit" name="{{summary['id']}}" value="Generate Report" />
                 </form>
             </h4>
             {% endfor %}
+            <h4><hr><br>Here is some additional information on model #4:<br><form action="/final" method="POST" >
+                <input type="submit" name="name" value="Final Evaluation" /></h4>
         </div>
-        <div class="column" style="background-color: #bb9068">
+        <div class="column" style="background-color: #6c59b6">
             <h3>About me</h3>
-            <h2><img src="static/placeholder.jpg" class='center' style='width:200px;height: 150px;'/></h2>
+            <h2><img src="static/family.jpg" class='center' style='width:200px;'/></h2>
             <p>Gavin Ray lives with his family in Bellingham Washington, where he founded Godfreyluck Games 
                 LLC. Last year, he descovered the amazing world of data science while researching advanced
                 video game tools. The change in focus to machine learning has been a welcomed one; Gavin 
                 also enjoys data analysis and data engineering.</p>
             <p>Over the Summer of 2020, he completed the Data Science Immersive at Galvanize. He is now
-                continuing his learning with independed projects while looking for the right team to devote
+                continuing his learning with independent projects while looking for the right team to devote
                 his time to. If you are interested in Auto-Moto, you might want to check out Boxcar as well!
-                Or send us an email at Gavin.Ray.M@gamil.com</p>
+                Or send us an email at Gavin.Ray.M@gmail.com</p>
                 <h3>
                 <a href="https://github.com/gavinraym/Boxcar" target="_blank">BoxCar on Github</a> 
                 <br><br>
                 <a href="https://www.linkedin.com/in/i-am-gavin-ray/" target="_blank">LinkedIn</a> 
                 <br><br>
                 <a href="https://store.steampowered.com/app/1102740/Going_Up/" target="_blank">'Going Up?' on Steam </a> </h3>
+                        
         </div>
     </div> 
 </body>

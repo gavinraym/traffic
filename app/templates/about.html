@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <style>
+        h1 {text-align: center; font-size: 35px;}
+        p {margin-left: 150px; margin-right: 150px; text-indent: 100px;}
+        h2 {margin-left: 150px;}
+        body {background-color: #6acfd1}
+    </style>
+    <h1>Auto-Moto: Traffic Sign Classification</h1>
+    <p>The German Traffic Sign Recognition Benchmark was a competition held in 2011. 
+        The data set used in the competition included 50k+ images of European traffic signs, and teams were required to 
+        develop machine learning models to classify them. For Auto-Moto, I've decided to use
+        the same dataset. I built this dashboard and website to aid with evaluation of models.
+        Each model has a report that can be generated. Furthermore, the final model can 
+        also be evaluated with a small collection of additional images that were taken by my sister
+        in England.</p> 
+        <p><a href="http://benchmark.ini.rub.de/?section=gtsrb&subsection=dataset">German Traffic Sign Recognition Benchmark Official Website</a></p>
+    <p>
+        Our training data is split into 43 target classes, representing 43 real European traffic signs. 
+        As you can see in the graph below, the images are unbalanced between the classes. Because of the
+        high accuracy I achieved without addressing the unbalanced class issue and due to time constraints,
+        I have left the training data as is. However, in the future I would like to try adjusting weights during training
+        to account for the over-abundance of certain signs to see if this will improve our scores
+        further. In particular, sign #32 (End Restrictions) classifies very poorly with every model and 
+        has a very low relative class frequency. Adjusting for the class imbalance my help improve our 
+        ability to classify this sign in particular.</p>
+    
+        <h2><img src="static/meta_sign_info.png" class="left" style="width:700px" /></h2>
+
+    <p> It is important to note that the images were taken from video footage recorded
+        by a mounted camera. Each real life sign is represented in a series of about 30 photos
+        taken as the vehicle carrying the camera drove past it. As a result, you may see what appears 
+        to be the same photo showing up multiple times. These are actually different
+        photos taken of the same sign. This is not ideal for what should be obvious reason. Mainly, 
+        I noticed repeatedly that my models would mis-classify many pictures of the same signs. This would make
+        it seem that the model is mis-classifying many images, when in actuality many of those images were
+        near to identical. However, this data set is ideal in many other ways. Each image has been centered 
+        cropped around the sign. It is also organized in an easy to use way.</p>
+        <h2><img src="static/selection.png" class="left" style="width:500px" /></h2>
+
+    <p>Throughout my work on this process, I trained a great number of convolutional neural networks. 
+        Highlighted on this website are four. To begin my analysis, I used a model structure found at data-flair, a Python projects blog site.
+        While it did in fact deliver the high accuracy promised, I also found the model to be extremely 
+        overfit. I guess that's one good way to get high accuracy scores! However well that might work for 
+        a blog, overfitting a model is not beneficial in real world scenarios. My second model corrected         
+        in two ways. First I decreased the learning rate. The most benefit came when adding two batch 
+        normalization layers.
+        
+        When evaluating the results of the second model, I noticed that many of the images classified 
+        with a low certainty incorrectly were darker than . With model number 3, I added several 
+        pre-processing image filters including a brightness filter that makes the images darker. For the
+        fourth and final model, I have added more image filters and run the model for a great deal more epochs.
+    </p> 
+        
+    <h1><form action="/" method="GET" >
+        <input type="submit" name="Home" value="Home" /></h1>
+
