@@ -32,10 +32,10 @@
         by a mounted camera. Each real life sign is represented in a series of about 30 photos
         taken as the vehicle carrying the camera drove past it. As a result, you may see what appears 
         to be the same photo showing up multiple times. These are actually different
-        photos taken of the same sign. This is not ideal for what should be obvious reason. Mainly, 
+        photos taken of the same sign. This is not ideal for what should be obvious reasons. Mainly, 
         I noticed repeatedly that my models would mis-classify many pictures of the same signs. This would make
         it seem that the model is mis-classifying many images, when in actuality many of those images were
-        near to identical. However, this data set is ideal in many other ways. Each image has been centered 
+        near to identical. However, this data set is ideal in many other ways. Each image has been centered and 
         cropped around the sign. It is also organized in an easy to use way.</p>
         <h2><img src="static/selection.png" class="left" style="width:500px" /></h2>
 
@@ -47,8 +47,8 @@
         in two ways. First I decreased the learning rate. The most benefit came when adding two batch 
         normalization layers.
         
-        When evaluating the results of the second model, I noticed that many of the images classified 
-        with a low certainty incorrectly were darker than . With model number 3, I added several 
+        When evaluating the results of the second model, I noticed that it was classifying darker images 
+        with a lower certainty than lighter ones. With model number 3, I added several 
         pre-processing image filters including a brightness filter that makes the images darker. For the
         fourth and final model, I have added more image filters and run the model for a great deal more epochs.
     </p> 
